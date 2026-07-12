@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | StudyShare</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header-row">
+        <h2>Student Dashboard</h2>
+        <a href="#" id="logout-button">Logout</a>
+      </div>
+      <div class="stats" id="stats"></div>
+      <div class="grid" style="margin-top: 1rem;">
+        <section class="card">
+          <h3>Recent uploads</h3>
+          <div id="recent-uploads" class="list"></div>
+        </section>
+        <section class="card">
+          <h3>Notifications</h3>
+          <div id="notifications" class="list"></div>
+        </section>
+      </div>
+      <div class="card" style="margin-top: 1rem;">
+        <div class="header-row">
+          <h3>Quick links</h3>
+        </div>
+        <div class="inline-actions">
+          <a href="/upload.html">Upload Material</a>
+          <a href="/browse.html">Browse Materials</a>
+          <a href="/saved.html">Saved Materials</a>
+          <a href="/uploads.html">My Uploads</a>
+          <a href="/profile.html">Profile</a>
+        </div>
+      </div>
+    </div>
+    <script src="/app.js"></script>
+    <script>
+      async function loadDashboard() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          window.location.href = '/login.html';
+          return;
+        }
+        const response = await fetch('/api/dashboard', { headers: { Authorization: `Bearer ${token}` } });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Unable to load dashboard');
+        document.getElementById('stats').innerHTML = `
+          <div class="stat"><strong>${data.totals.uploaded}</strong><div>Files uploaded</div></div>
+          <div class="stat"><strong>${data.totals.downloads}</strong><div>Total downloads</div></div>
+          <div class="stat"><strong>${data.totals.saved}</strong><div>Saved materials</div></div>
+        `;
+        const recent = document.getElementById('recent-uploads');
+        recent.innerHTML = (data.recentUploads || []).map(item => `<div class="resource-item"><h4>${item.title}</h4><div class="small">${item.module_code} • ${item.file_type}</div></div>`).join('');
+        const notifications = document.getElementById('notifications');
+        notifications.innerHTML = (data.notifications || []).map(item => `<div class="resource-item"><div>${item.message}</div></div>`).join('');
+      }
+      document.addEventListener('DOMContentLoaded', loadDashboard);
+    </script>
+  </body>
+</html>

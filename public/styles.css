@@ -1,0 +1,43 @@
+:root {
+  color-scheme: light;
+  font-family: Inter, Arial, sans-serif;
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --primary: #4f46e5;
+  --secondary: #0f172a;
+  --text: #1e293b;
+  --muted: #64748b;
+  --border: #e2e8f0;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); }
+a { color: var(--primary); text-decoration: none; }
+.nav, .hero-content, .container, .form-card { max-width: 1100px; margin: 0 auto; }
+.hero { background: linear-gradient(135deg, #312e81, #4f46e5); color: white; padding: 1rem 2rem 4rem; }
+.nav { display: flex; justify-content: space-between; align-items: center; }
+.brand { font-size: 1.3rem; font-weight: 700; }
+.nav-links { display: flex; gap: 1rem; }
+.nav-links a { color: white; }
+.hero-content { padding: 4rem 0 1rem; }
+.hero-content h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+.hero-content p { max-width: 650px; color: rgba(255,255,255,0.92); }
+.hero-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
+.btn { display: inline-block; padding: 0.8rem 1.2rem; border-radius: 999px; border: 1px solid white; color: white; }
+.btn.primary { background: white; color: var(--primary); border: none; }
+.container { padding: 2rem; }
+.card-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.card, .form-card, .list-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.2rem; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05); }
+form { display: grid; gap: 0.8rem; }
+input, textarea, select, button { width: 100%; padding: 0.75rem 0.9rem; border-radius: 10px; border: 1px solid var(--border); font: inherit; }
+button { background: var(--primary); color: white; cursor: pointer; border: none; }
+.grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.small { color: var(--muted); font-size: 0.95rem; }
+.stats { display: flex; gap: 1rem; flex-wrap: wrap; }
+.stat { flex: 1; min-width: 150px; background: #eef2ff; border-radius: 12px; padding: 1rem; }
+.header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.list { display: grid; gap: 0.8rem; }
+.resource-item { border: 1px solid var(--border); border-radius: 12px; padding: 1rem; background: white; }
+.resource-item h4 { margin: 0 0 0.3rem; }
+.inline-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.inline-actions a, .inline-actions button { width: auto; padding: 0.5rem 0.8rem; }
+.auth-link { margin-top: 1rem; text-align: center; }

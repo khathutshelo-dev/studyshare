@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Browse Materials | StudyShare</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header-row">
+        <h2>Browse Materials</h2>
+        <a href="/dashboard.html">Dashboard</a>
+      </div>
+      <div class="form-card" style="margin-bottom: 1rem;">
+        <form id="browse-form">
+          <input name="search" placeholder="Search by module, course, title, keywords" />
+          <input name="university" placeholder="University" />
+          <input name="faculty" placeholder="Faculty" />
+          <input name="course" placeholder="Course" />
+          <input name="module" placeholder="Module" />
+          <input name="year" placeholder="Year" />
+          <input name="semester" placeholder="Semester" />
+          <input name="fileType" placeholder="File Type" />
+          <button type="submit">Search</button>
+        </form>
+      </div>
+      <div id="results" class="list"></div>
+    </div>
+    <script>
+      async function loadMaterials(params = {}) {
+        const query = new URLSearchParams(params).toString();
+        const response = await fetch(`/api/materials${query ? `?${query}` : ''}`);
+        const data = await response.json();
+        const results = document.getElementById('results');
+        results.innerHTML = (data.materials || []).map((material) => `
+          <div class="resource-item">
+            <h4>${material.title}</h4>
+            <div class="small">${material.university} • ${material.faculty} • ${material.course} • ${material.module_code}</div>
+            <p>${material.description || ''}</p>
+            <div class="inline-actions">
+              <a href="/material.html?id=${material.id}">View details</a>
+              <a href="/api/materials/${material.id}/download">Download</a>
+            </div>
+          </div>
+        `).join('');
+      }
+      document.getElementById('browse-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const form = new FormData(event.target);
+        const params = Object.fromEntries(form.entries());
+        loadMaterials(params);
+      });
+      loadMaterials();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile | StudyShare</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="container" style="max-width: 760px;">
+      <div class="form-card">
+        <h2>Update Profile</h2>
+        <form id="profile-form">
+          <input name="fullName" placeholder="Full name" />
+          <textarea name="bio" placeholder="Bio"></textarea>
+          <input name="university" placeholder="University" />
+          <input name="faculty" placeholder="Faculty" />
+          <input name="course" placeholder="Course" />
+          <input name="yearOfStudy" placeholder="Year of study" />
+          <button type="submit">Save Profile</button>
+        </form>
+      </div>
+    </div>
+    <script>
+      const token = localStorage.getItem('token');
+      async function loadProfile() {
+        if (!token) {
+          window.location.href = '/login.html';
+          return;
+        }
+        const response = await fetch('/api/profile', { headers: { Authorization: `Bearer ${token}` } });
+        const data = await response.json();
+        const form = document.getElementById('profile-form');
+        form.fullName.value = data.user.full_name || '';
+        form.bio.value = data.user.bio || '';
+        form.university.value = data.user.university || '';
+        form.faculty.value = data.user.faculty || '';
+        form.course.value = data.user.course || '';
+        form.yearOfStudy.value = data.user.year_of_study || '';
+      }
+      document.getElementById('profile-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const form = new FormData(event.target);
+        const response = await fetch('/api/profile', {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fullName: form.get('fullName'),
+            bio: form.get('bio'),
+            university: form.get('university'),
+            faculty: form.get('faculty'),
+            course: form.get('course'),
+            yearOfStudy: form.get('yearOfStudy')
+          })
+        });
+        const data = await response.json();
+        alert(response.ok ? 'Profile updated' : data.error || 'Failed');
+      });
+      loadProfile();
+    </script>
+  </body>
+</html>

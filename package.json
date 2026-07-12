@@ -1,0 +1,21 @@
+{
+  "name": "study-share",
+  "version": "1.0.0",
+  "description": "Study material sharing platform with Node.js, Express, PostgreSQL, and Neon",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server-memory.js",
+    "dev": "node server-memory.js",
+    "start:postgres": "node server.js",
+    "init:neon": "node scripts/init-neon.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.0",
+    "dotenv": "^16.4.1",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.1",
+    "multer": "^1.4.1",
+    "pg": "^8.12.0"
+  }
+}

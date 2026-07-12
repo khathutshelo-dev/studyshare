@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Uploads | StudyShare</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header-row">
+        <h2>My Uploads</h2>
+        <a href="/dashboard.html">Dashboard</a>
+      </div>
+      <div id="uploads" class="list"></div>
+    </div>
+    <script>
+      const token = localStorage.getItem('token');
+      async function loadUploads() {
+        if (!token) {
+          window.location.href = '/login.html';
+          return;
+        }
+        const response = await fetch('/api/uploads', { headers: { Authorization: `Bearer ${token}` } });
+        const data = await response.json();
+        const uploads = document.getElementById('uploads');
+        uploads.innerHTML = (data.materials || []).map((material) => `
+          <div class="resource-item">
+            <h4>${material.title}</h4>
+            <div class="small">${material.module_code} • ${material.file_type}</div>
+            <div class="inline-actions">
+              <button onclick="updateUpload(${material.id})">Edit</button>
+              <button onclick="deleteUpload(${material.id})">Delete</button>
+            </div>
+          </div>
+        `).join('');
+      }
+      async function updateUpload(id) {
+        const title = prompt('New title');
+        if (title === null) return;
+        const description = prompt('New description');
+        const formData = new FormData();
+        if (title) formData.append('title', title);
+        if (description !== null) formData.append('description', description);
+        const response = await fetch(`/api/uploads/${id}`, { method: 'PUT', headers: { Authorization: `Bearer ${token}` }, body: formData });
+        const data = await response.json();
+        if (!response.ok) alert(data.error || 'Update failed'); else alert('Updated');
+        loadUploads();
+      }
+      async function deleteUpload(id) {
+        if (!confirm('Delete this upload?')) return;
+        const response = await fetch(`/api/uploads/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+        const data = await response.json();
+        if (!response.ok) alert(data.error || 'Delete failed'); else alert('Deleted');
+        loadUploads();
+      }
+      loadUploads();
+    </script>
+  </body>
+</html>

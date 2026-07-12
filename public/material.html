@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Material Details | StudyShare</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="container" style="max-width: 860px;">
+      <div id="material-details" class="card"></div>
+      <div class="card" style="margin-top: 1rem;">
+        <h3>Rate this material</h3>
+        <form id="rating-form">
+          <input name="score" type="number" min="1" max="5" placeholder="1-5" required />
+          <button type="submit">Submit Rating</button>
+        </form>
+      </div>
+      <div class="card" style="margin-top: 1rem;">
+        <h3>Comments</h3>
+        <form id="comment-form">
+          <textarea name="content" placeholder="Add a comment"></textarea>
+          <button type="submit">Post Comment</button>
+        </form>
+        <div id="comments" class="list" style="margin-top: 1rem;"></div>
+      </div>
+    </div>
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      const token = localStorage.getItem('token');
+      async function loadMaterial() {
+        const response = await fetch(`/api/materials/${id}`);
+        const data = await response.json();
+        const material = data.material || {};
+        document.getElementById('material-details').innerHTML = `
+          <h2>${material.title}</h2>
+          <div class="small">Uploaded by ${material.uploader || 'Unknown'} • ${material.file_type || ''}</div>
+          <p>${material.description || ''}</p>
+          <div class="small">University: ${material.university} • Faculty: ${material.faculty} • Course: ${material.course}</div>
+          <div class="small">Module: ${material.module_code} • Year: ${material.year} • Semester: ${material.semester}</div>
+          <div class="inline-actions" style="margin-top: 1rem;">
+            <a href="/api/materials/${material.id}/download">Download</a>
+            <button id="save-button">Save</button>
+          </div>
+          <div class="small" style="margin-top: 0.7rem;">Downloads: ${material.downloads_count || 0} • Rating: ${material.average_rating || 0}</div>
+        `;
+        document.getElementById('comments').innerHTML = (data.comments || []).map((comment) => `<div class="resource-item"><strong>${comment.user_name || 'Student'}</strong><div>${comment.content}</div></div>`).join('');
+        const saveButton = document.getElementById('save-button');
+        saveButton.addEventListener('click', async () => {
+          if (!token) {
+            window.location.href = '/login.html';
+            return;
+          }
+          const response = await fetch(`/api/materials/${id}/save`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+          const data = await response.json();
+          alert(data.saved ? 'Saved to your collection' : 'Removed from saved collection');
+        });
+      }
+      document.getElementById('rating-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!token) {
+          window.location.href = '/login.html';
+          return;
+        }
+        const form = new FormData(event.target);
+        const response = await fetch(`/api/materials/${id}/rate`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ score: Number(form.get('score')) })
+        });
+        const data = await response.json();
+        alert(`Average rating updated to ${data.averageRating}`);
+      });
+      document.getElementById('comment-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!token) {
+          window.location.href = '/login.html';
+          return;
+        }
+        const form = new FormData(event.target);
+        const response = await fetch(`/api/materials/${id}/comment`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: form.get('content') })
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          alert(data.error || 'Could not comment');
+          return;
+        }
+        alert('Comment posted');
+        event.target.reset();
+        loadMaterial();
+      });
+      loadMaterial();
+    </script>
+  </body>
+</html>

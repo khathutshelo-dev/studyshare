@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Material | StudyShare</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="container" style="max-width: 760px;">
+      <div class="form-card">
+        <h2>Upload Study Material</h2>
+        <form id="upload-form" enctype="multipart/form-data">
+          <input name="title" placeholder="Title" required />
+          <textarea name="description" placeholder="Description"></textarea>
+          <input name="university" placeholder="University" required />
+          <input name="faculty" placeholder="Faculty" required />
+          <input name="course" placeholder="Course" required />
+          <input name="moduleCode" placeholder="Module Code" required />
+          <input name="year" placeholder="Year" required />
+          <input name="semester" placeholder="Semester" required />
+          <input name="fileType" placeholder="File type" required />
+          <input name="tags" placeholder="Tags (comma separated)" />
+          <input type="file" name="file" required />
+          <button type="submit">Upload</button>
+        </form>
+      </div>
+    </div>
+    <script src="/app.js"></script>
+    <script>
+      const token = localStorage.getItem('token');
+      document.getElementById('upload-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!token) {
+          window.location.href = '/login.html';
+          return;
+        }
+        const form = event.target;
+        const formData = new FormData(form);
+        const response = await fetch('/api/materials', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          alert(data.error || 'Upload failed');
+          return;
+        }
+        alert('Upload complete');
+        form.reset();
+      });
+    </script>
+  </body>
+</html>
